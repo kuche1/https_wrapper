@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-from OpenSSL import crypto, SSL # python3 -m pip install pyopenssl # pip3 install pyopenssl
+from OpenSSL import crypto, SSL # python3 -m pip install pyopenssl
 import requests
 from time import gmtime, mktime
 
