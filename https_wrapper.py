@@ -12,8 +12,8 @@ LISTEN = 5
 
 # speed limiter
 
-# REDIRECT_LOOP_SPEEP = 0.01
 SPEED_LIMIT_SLEEP = 0.05 # seconds
+NO_ACTIVITY_SLEEP = 0.001
 
 # certificates
 
@@ -63,7 +63,7 @@ def redirect_traffic2(client, client_addr, server_port, speed_limit):
                 server.sendall(data)
                 server.setblocking(False)
 
-        if time.time() >= next_upload:
+        elif time.time() >= next_upload:
             try:
                 data = server.recv(upload_chunk)
             except BlockingIOError:
@@ -79,9 +79,10 @@ def redirect_traffic2(client, client_addr, server_port, speed_limit):
                 client.setblocking(False)
                 time.sleep(SPEED_LIMIT_SLEEP)
         
-        # time.sleep(REDIRECT_LOOP_SPEEP)
+        else:
+            time.sleep(NO_ACTIVITY_SLEEP)
 
-    print('done')
+    # print('done')
 
 def main_connection_accepter(sock, server_port, speed_limit):
     while True:
