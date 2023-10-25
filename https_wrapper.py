@@ -13,7 +13,7 @@ LISTEN = 5
 # speed limiter
 
 SPEED_LIMIT_SLEEP = 0.05 # seconds
-NO_ACTIVITY_SLEEP = 0.001
+INACTIVITY_SLEEP = 0.001
 
 # certificates
 
@@ -52,10 +52,8 @@ def redirect_traffic2(client, client_addr, server_port, speed_limit):
         if time.time() >= next_download:
             try:
                 data = client.recv(download_chunk)
-            except BlockingIOError:
-                pass
-            except ssl.SSLWantReadError:
-                pass
+            except (BlockingIOError, ssl.SSLWantReadError):
+                time.sleep(INACTIVITY_SLEEP)
             else:
                 next_download = time.time() + SPEED_LIMIT_SLEEP * (len(data) / download_chunk)
 
@@ -63,11 +61,11 @@ def redirect_traffic2(client, client_addr, server_port, speed_limit):
                 server.sendall(data)
                 server.setblocking(False)
 
-        elif time.time() >= next_upload:
+        if time.time() >= next_upload:
             try:
                 data = server.recv(upload_chunk)
             except BlockingIOError:
-                pass
+                time.sleep(INACTIVITY_SLEEP)
             else:
                 if len(data) == 0:
                     break
@@ -78,11 +76,8 @@ def redirect_traffic2(client, client_addr, server_port, speed_limit):
                 client.sendall(data)
                 client.setblocking(False)
                 time.sleep(SPEED_LIMIT_SLEEP)
-        
-        else:
-            time.sleep(NO_ACTIVITY_SLEEP)
 
-    # print('done')
+    print('done')
 
 def main_connection_accepter(sock, server_port, speed_limit):
     while True:
