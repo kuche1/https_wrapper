@@ -1,5 +1,9 @@
 #! /usr/bin/env python3
 
+# TODO
+#
+# the speed limiter is now pretty inaccurate
+
 import argparse
 import socket
 import os
